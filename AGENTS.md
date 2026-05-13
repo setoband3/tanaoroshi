@@ -13,6 +13,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - `basePath` は `next.config.ts` の **`/tanaoroshi`**（社内 Nginx がサブパスでプロキシ）
 
 ### ローカル開発
+- 開発用ローカル例: `D:\sofix_Ubuntu_APP\Cursor_app\tanaoroshi`（フォルダ名は環境に合わせて変更可）
 - 開発 URL: `http://localhost:3000/tanaoroshi/`（`basePath` あり）
 - **iCloud Drive 上**では `node_modules` / Prisma のファイル読み込みが失敗することがある。**ローカルディスクに clone または移動**し、`npm install` → `npm run build` を推奨
 - **`.next` と `node_modules` は移動・バックアップ不要**。新しい場所で `npm install`（または `npm ci`）と `npm run build` で再生成
