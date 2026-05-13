@@ -32,6 +32,7 @@ function LineRow({
 }) {
   const router = useRouter();
   const [productName, setProductName] = useState(line.productName);
+  const [specification, setSpecification] = useState(line.specification);
   const [quantity, setQuantity] = useState(line.quantity);
   const [unit, setUnit] = useState(line.unit);
   const [unitPrice, setUnitPrice] = useState(line.unitPrice);
@@ -41,6 +42,7 @@ function LineRow({
 
   useEffect(() => {
     setProductName(line.productName);
+    setSpecification(line.specification);
     setQuantity(line.quantity);
     setUnit(line.unit);
     setUnitPrice(line.unitPrice);
@@ -84,6 +86,17 @@ function LineRow({
             if (productName !== line.productName) flush({ productName });
           }}
           placeholder="品名"
+        />
+      </td>
+      <td className="p-1 align-top">
+        <input
+          className="w-full min-w-[8rem] rounded border border-zinc-300 px-2 py-1.5 text-sm dark:border-zinc-600 dark:bg-zinc-900"
+          value={specification}
+          onChange={(e) => setSpecification(e.target.value)}
+          onBlur={() => {
+            if (specification !== line.specification) flush({ specification });
+          }}
+          placeholder="規格"
         />
       </td>
       <td className="p-1 align-top text-right">
@@ -201,10 +214,10 @@ export function ReportEditor({ report }: { report: SerializedReport }) {
   };
 
   const exportCsv = () => {
-    const header = ["グループ色", "品名", "数量", "単位", "単価(税抜)", "合計(税抜)", "備考"];
+    const header = ["グループ色", "品名", "規格", "数量", "単位", "単価(税抜)", "合計(税抜)", "備考"];
     const rows = report.lines.map((l) => {
       const color = l.groupColor ?? "";
-      return [color, l.productName, l.quantity, l.unit, l.unitPrice, l.amount, l.remarks]
+      return [color, l.productName, l.specification, l.quantity, l.unit, l.unitPrice, l.amount, l.remarks]
         .map((cell) => `"${String(cell).replace(/"/g, '""')}"`)
         .join(",");
     });
@@ -280,11 +293,12 @@ export function ReportEditor({ report }: { report: SerializedReport }) {
       </div>
 
       <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-        <table className="w-full min-w-[64rem] border-collapse text-sm">
+        <table className="w-full min-w-[72rem] border-collapse text-sm">
           <thead>
             <tr className="bg-zinc-100 text-left text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300">
               <th className="whitespace-nowrap px-2 py-2 font-medium">グループ</th>
               <th className="min-w-[10rem] px-2 py-2 font-medium">品名</th>
+              <th className="min-w-[8rem] px-2 py-2 font-medium">規格</th>
               <th className="min-w-[4.5rem] px-2 py-2 text-right font-medium">数量</th>
               <th className="min-w-[4rem] px-2 py-2 font-medium">単位</th>
               <th className="min-w-[6rem] px-2 py-2 text-right font-medium">単価（税抜）</th>
@@ -296,7 +310,7 @@ export function ReportEditor({ report }: { report: SerializedReport }) {
           <tbody>
             {report.lines.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-4 py-10 text-center text-zinc-500">
+                <td colSpan={9} className="px-4 py-10 text-center text-zinc-500">
                   行がありません。「行を追加」から入力してください。
                 </td>
               </tr>
@@ -308,7 +322,7 @@ export function ReportEditor({ report }: { report: SerializedReport }) {
           </tbody>
           <tfoot>
             <tr className="bg-zinc-50 font-semibold dark:bg-zinc-900">
-              <td colSpan={5} className="px-2 py-3 text-right text-zinc-700 dark:text-zinc-300">
+              <td colSpan={6} className="px-2 py-3 text-right text-zinc-700 dark:text-zinc-300">
                 合計（税抜）
               </td>
               <td className="px-2 py-3 text-right tabular-nums text-zinc-900 dark:text-zinc-50">

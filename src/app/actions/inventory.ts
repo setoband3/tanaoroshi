@@ -74,6 +74,7 @@ export async function addLine(reportId: string) {
       reportId,
       sortOrder,
       productName: "",
+      specification: "",
       quantity: 0,
       unit: "",
       unitPrice: 0,
@@ -91,6 +92,7 @@ export async function deleteLine(lineId: string, reportId: string) {
 
 export type LineUpdatePayload = {
   productName?: string;
+  specification?: string;
   quantity?: string;
   unit?: string;
   unitPrice?: string;
@@ -121,6 +123,7 @@ export async function updateLine(
     amount,
   };
   if (payload.productName !== undefined) data.productName = payload.productName;
+  if (payload.specification !== undefined) data.specification = payload.specification;
   if (payload.unit !== undefined) data.unit = payload.unit;
   if (payload.remarks !== undefined) data.remarks = payload.remarks;
   if (payload.groupColor !== undefined) data.groupColor = payload.groupColor;

@@ -4,6 +4,7 @@ export type SerializedLine = {
   id: string;
   sortOrder: number;
   productName: string;
+  specification: string;
   quantity: string;
   unit: string;
   unitPrice: string;
@@ -26,6 +27,7 @@ function lineToSerialized(l: InventoryLine): SerializedLine {
     id: l.id,
     sortOrder: l.sortOrder,
     productName: l.productName,
+    specification: l.specification,
     quantity: l.quantity.toString(),
     unit: l.unit,
     unitPrice: l.unitPrice.toString(),

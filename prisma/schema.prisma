@@ -28,6 +28,8 @@ model InventoryLine {
   report      InventoryReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
   sortOrder   Int             @default(0)
   productName String          @default("")
+  /// 規格
+  specification String        @default("")
   /// 数量（合計＝数量×単価で自動計算）
   quantity    Decimal         @default(0)
   /// 単位（棟・台・式など）
