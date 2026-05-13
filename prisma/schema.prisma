@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+/// 20日締めごとの棚卸しレポート（複数期間を同時に保持）
+model InventoryReport {
+  id          String          @id @default(cuid())
+  closingDate DateTime
+  periodStart DateTime
+  periodEnd   DateTime
+  memo        String          @default("")
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  lines       InventoryLine[]
+
+  @@unique([closingDate])
+  @@index([closingDate(sort: Desc)])
+}
+
+model InventoryLine {
+  id          String          @id @default(cuid())
+  reportId    String
+  report      InventoryReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  sortOrder   Int             @default(0)
+  productName String          @default("")
+  /// 数量（合計＝数量×単価で自動計算）
+  quantity    Decimal         @default(0)
+  /// 単位（棟・台・式など）
+  unit        String          @default("")
+  /// 単価（税抜）
+  unitPrice   Decimal         @default(0)
+  /// 合計（税抜）＝ quantity * unitPrice
+  amount      Decimal         @default(0)
+  remarks     String          @default("")
+  /// 同じ色の行をスプレッドシートの「セル色グループ」相当で表示
+  groupColor  String?
+
+  @@index([reportId, sortOrder])
+}

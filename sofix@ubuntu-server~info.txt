@@ -1,0 +1,69 @@
+sofix@ubuntu-server:~$ whoami
+sofix
+sofix@ubuntu-server:~$ hostname
+ubuntu-server
+sofix@ubuntu-server:~$ pwd
+/home/sofix
+sofix@ubuntu-server:~$ uname -a
+Linux ubuntu-server 7.0.0-15-generic #15-Ubuntu SMP PREEMPT_DYNAMIC Wed Apr 22 16:06:43 UTC 2026 x86_64 GNU/Linux
+sofix@ubuntu-server:~$ ls -la ~
+total 236
+drwxr-x--- 11 sofix sofix  4096 May  5 02:11 .
+drwxr-xr-x  3 root  root   4096 May  2 17:14 ..
+-rw-------  1 sofix sofix 18692 May  9 02:33 .bash_history
+-rw-r--r--  1 sofix sofix   220 Feb 13 12:16 .bash_logout
+-rw-r--r--  1 sofix sofix  3771 Feb 13 12:16 .bashrc
+drwx------  2 sofix sofix  4096 May  2 17:19 .cache
+drwxrwxr-x  3 sofix sofix  4096 May  4 12:28 .local
+drwxrwxr-x  4 sofix sofix  4096 May  5 02:12 .npm
+drwxrwxr-x  5 sofix sofix  4096 May  5 02:18 .pm2
+-rw-r--r--  1 sofix sofix   807 Feb 13 12:16 .profile
+drwx------  2 sofix sofix  4096 May  6 23:17 .ssh
+-rw-rw-r--  1 sofix sofix  2107 May  4 11:53 README.md
+-rw-rw-r--  1 sofix sofix   888 May  4 11:53 index.html
+-rw-rw-r--  1 sofix sofix  8164 May  4 11:53 order-sheet-backup-20260502-151730.json
+-rw-rw-r--  1 sofix sofix   195 May  4 11:53 run-app.bat
+-rw-rw-r--  1 sofix sofix  3204 May  4 11:53 serve.ps1
+-rw-rw-r--  1 sofix sofix  6196 May  4 12:35 seto_yukyu_data.json
+drwx------  6 sofix sofix  4096 May  4 11:53 src
+-rw-rw-r--  1 sofix sofix   338 May  4 11:53 stop-app.bat
+drwxrwxr-x  3 sofix sofix  4096 May  7 10:12 uriage-app
+drwx------  3 sofix sofix  4096 May  4 11:53 vendor
+drwxrwxr-x  2 sofix sofix  4096 May  4 12:35 yukyu-app
+-rw-rw-r--  1 sofix sofix 53505 May  4 12:34 yukyu.html
+-rw-rw-r--  1 sofix sofix 54762 May  4 13:10 yukyu_new.html
+-rw-rw-r--  1 sofix sofix  9199 May  4 11:53 私が、今日協力業者さんに、お願いをするときの発注書をWEBアプリで、作.txt
+sofix@ubuntu-server:~$ ls -la /var/www 2>/dev/null || echo "no /var/www or no permission"
+total 20
+drwxr-xr-x  5 root     root     4096 May  4 12:32 .
+drwxr-xr-x 14 root     root     4096 May  4 11:43 ..
+drwxr-xr-x  2 root     root     4096 May  4 11:43 html
+drwxr-xr-x  4 www-data www-data 4096 May  4 11:53 order_sheet
+drwxr-xr-x  2 root     root     4096 May  4 13:31 yukyu
+sofix@ubuntu-server:~$ ls -la /opt 2>/dev/null || echo "no /opt or no permission"
+total 8
+drwxr-xr-x  2 root root 4096 Apr 20 18:05 .
+drwxr-xr-x 20 root root 4096 May  2 17:05 ..
+sofix@ubuntu-server:~$ ss -tlnp 2>/dev/null || sudo ss -tlnp
+State  Recv-Q Send-Q Local Address:Port Peer Address:PortProcess
+LISTEN 0      4096      127.0.0.54:53        0.0.0.0:*
+LISTEN 0      4096   127.0.0.53%lo:53        0.0.0.0:*
+LISTEN 0      200        127.0.0.1:5432      0.0.0.0:*
+LISTEN 0      4096         0.0.0.0:22        0.0.0.0:*
+LISTEN 0      511          0.0.0.0:80        0.0.0.0:*
+LISTEN 0      511                *:3001            *:*    users:(("node /home/sofi",pid=41304,fd=23))
+LISTEN 0      511                *:3000            *:*    users:(("node /home/sofi",pid=14741,fd=23))
+LISTEN 0      4096            [::]:22           [::]:*
+sofix@ubuntu-server:~$ sudo netstat -tlnp 2>/dev/null || netstat -tlnp
+[sudo: authenticate] Password:
+Command 'netstat' not found, but can be installed with:
+sudo apt install net-tools
+sofix@ubuntu-server:~$ sudo netstat -tlnp 2>/dev/null || netstat -tlnp
+Command 'netstat' not found, but can be installed with:
+sudo apt install net-tools
+sofix@ubuntu-server:~$ systemctl is-active nginx 2>/dev/null; systemctl is-active apache2 2>/dev/null
+command -v pm2; command -v docker
+active
+inactive
+/usr/local/bin/pm2
+sofix@ubuntu-server:~$
