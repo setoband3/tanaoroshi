@@ -265,6 +265,16 @@ export function ReportEditor({ report }: { report: SerializedReport }) {
           rows={2}
           value={memo}
           onChange={(e) => onMemoChange(e.target.value)}
+          onBlur={() => {
+            if (memoTimer.current) clearTimeout(memoTimer.current);
+            memoTimer.current = undefined;
+            if (memo !== report.memo) {
+              startTransition(async () => {
+                await updateReportMemo(report.id, memo);
+                router.refresh();
+              });
+            }
+          }}
           placeholder="例: 5/10 税理士提出予定"
         />
       </div>
