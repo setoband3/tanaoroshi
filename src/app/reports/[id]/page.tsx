@@ -5,6 +5,9 @@ import { ReportEditor } from "@/components/ReportEditor";
 import { formatPeriodRange, parseLocalDate } from "@/lib/period";
 import { reportToSerialized } from "@/lib/serialize-report";
 
+/** Prisma 利用のためビルド時の静的プリレンダーを行わない */
+export const dynamic = "force-dynamic";
+
 type Props = { params: Promise<{ id: string }> };
 
 export default async function ReportPage(props: Props) {

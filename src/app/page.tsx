@@ -4,6 +4,9 @@ import { CreateReportForm } from "@/components/CreateReportForm";
 import { DeleteReportButton } from "@/components/DeleteReportButton";
 import { formatClosingLabel, formatPeriodRange, parseLocalDate } from "@/lib/period";
 
+/** Prisma 利用のためビルド時の静的プリレンダーを行わない */
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const [reports, defaultClosing] = await Promise.all([listReports(), suggestNextClosingIso()]);
 
