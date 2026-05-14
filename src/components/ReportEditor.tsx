@@ -315,6 +315,15 @@ export function ReportEditor({ report }: { report: SerializedReport }) {
           </button>
           <button
             type="button"
+            className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+            onClick={() => {
+              window.open(`/reports/${report.id}/print`, "_blank", "noopener,noreferrer");
+            }}
+          >
+            PDF出力
+          </button>
+          <button
+            type="button"
             className="rounded-lg bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white"
             disabled={isPending}
             onClick={() => {
