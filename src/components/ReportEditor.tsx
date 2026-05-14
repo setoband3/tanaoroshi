@@ -126,7 +126,7 @@ function LineRow({
       <td className="p-1 align-top text-right">
         <input
           inputMode="numeric"
-          className="w-[2.8rem] min-w-0 rounded border border-zinc-300 px-1.5 py-1.5 text-right text-sm tabular-nums dark:border-zinc-600 dark:bg-zinc-900"
+          className="w-[4.2rem] min-w-0 rounded border border-zinc-300 px-1.5 py-1.5 text-right text-sm tabular-nums dark:border-zinc-600 dark:bg-zinc-900"
           value={unitPrice}
           onChange={(e) => setUnitPrice(e.target.value)}
           onBlur={() => {
@@ -361,7 +361,7 @@ export function ReportEditor({ report }: { report: SerializedReport }) {
               <th className="min-w-[8rem] px-2 py-2 font-medium">規格</th>
               <th className="w-[3.2rem] px-2 py-2 text-right font-medium">数量</th>
               <th className="w-[4.2rem] px-2 py-2 font-medium">単位</th>
-              <th className="w-[2.8rem] px-2 py-2 text-right font-medium">単価（税抜）</th>
+              <th className="w-[4.2rem] px-2 py-2 text-right font-medium">単価（税抜）</th>
               <th className="min-w-[6rem] px-2 py-2 text-right font-medium">合計（税抜）</th>
               <th className="min-w-[12rem] px-2 py-2 font-medium">備考</th>
               <th className="px-2 py-2 font-medium" />
