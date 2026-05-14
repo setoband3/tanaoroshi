@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import {
   addLine,
   deleteLine,
+  importReportCsv,
   updateLine,
   updateReportMemo,
   type LineUpdatePayload,
@@ -174,7 +175,9 @@ function LineRow({
 export function ReportEditor({ report }: { report: SerializedReport }) {
   const router = useRouter();
   const [memo, setMemo] = useState(report.memo);
+  const [importError, setImportError] = useState<string | null>(null);
   const memoTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
@@ -232,6 +235,38 @@ export function ReportEditor({ report }: { report: SerializedReport }) {
     URL.revokeObjectURL(url);
   };
 
+  const downloadImportTemplate = () => {
+    const header = ["グループ色", "品名", "規格", "数量", "単位", "単価(税抜)", "備考"];
+    const sample = ["#A7F3D0", "例）養生シート", "2m×50m", "3", "本", "1200", "必要ならメモ"];
+    const bom = "\uFEFF";
+    const body = [
+      header.join(","),
+      sample.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","),
+    ].join("\n");
+    const blob = new Blob([bom + body], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "棚卸し_取込テンプレート.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const onImportCsvFile = async (file: File | null) => {
+    if (!file) return;
+    setImportError(null);
+    const text = await file.text();
+    startTransition(async () => {
+      const result = await importReportCsv(report.id, text);
+      if (!result.ok) {
+        setImportError(result.error);
+        return;
+      }
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      router.refresh();
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
@@ -246,6 +281,31 @@ export function ReportEditor({ report }: { report: SerializedReport }) {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+            onClick={downloadImportTemplate}
+          >
+            取込テンプレートCSV
+          </button>
+          <button
+            type="button"
+            className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+            disabled={isPending}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            CSV取込
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".csv,text/csv"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0] ?? null;
+              void onImportCsvFile(file);
+            }}
+          />
           <button
             type="button"
             className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-900 dark:hover:bg-zinc-800"
@@ -336,6 +396,10 @@ export function ReportEditor({ report }: { report: SerializedReport }) {
 
       <p className="text-xs text-zinc-500 dark:text-zinc-400">
         フィールドからフォーカスを外すと自動保存されます。合計は保存時に数量×単価で再計算されます。関連する明細（本体＋運搬費など）は同じグループ色を選ぶと、左端の帯と背景でひとまとまりに見えます。
+      </p>
+      {importError ? <p className="text-sm text-red-600 dark:text-red-400">{importError}</p> : null}
+      <p className="text-xs text-zinc-500 dark:text-zinc-400">
+        CSV取込は現在の明細をいったん置き換えます。必要なら先にCSVエクスポートしてバックアップしてください。
       </p>
     </div>
   );

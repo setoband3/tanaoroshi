@@ -10,6 +10,90 @@ import {
   periodRangeForClosing,
 } from "@/lib/period";
 
+type ParsedCsvRow = string[];
+
+function parseCsv(text: string): ParsedCsvRow[] {
+  const rows: ParsedCsvRow[] = [];
+  let row: string[] = [];
+  let cell = "";
+  let i = 0;
+  let inQuotes = false;
+  const normalized = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n").replace(/^\uFEFF/, "");
+
+  while (i < normalized.length) {
+    const ch = normalized[i];
+
+    if (inQuotes) {
+      if (ch === '"') {
+        if (normalized[i + 1] === '"') {
+          cell += '"';
+          i += 2;
+          continue;
+        }
+        inQuotes = false;
+        i += 1;
+        continue;
+      }
+      cell += ch;
+      i += 1;
+      continue;
+    }
+
+    if (ch === '"') {
+      inQuotes = true;
+      i += 1;
+      continue;
+    }
+    if (ch === ",") {
+      row.push(cell);
+      cell = "";
+      i += 1;
+      continue;
+    }
+    if (ch === "\n") {
+      row.push(cell);
+      rows.push(row);
+      row = [];
+      cell = "";
+      i += 1;
+      continue;
+    }
+    cell += ch;
+    i += 1;
+  }
+
+  if (cell !== "" || row.length > 0) {
+    row.push(cell);
+    rows.push(row);
+  }
+
+  return rows;
+}
+
+function normalizeHeaderName(value: string): string {
+  return value.replace(/\s+/g, "").replace(/[（）]/g, "()").trim();
+}
+
+function isLineBlank(values: {
+  productName: string;
+  specification: string;
+  quantity: string;
+  unit: string;
+  unitPrice: string;
+  remarks: string;
+  groupColor: string | null;
+}): boolean {
+  return (
+    values.productName.trim() === "" &&
+    values.specification.trim() === "" &&
+    values.quantity.trim() === "" &&
+    values.unit.trim() === "" &&
+    values.unitPrice.trim() === "" &&
+    values.remarks.trim() === "" &&
+    (values.groupColor ?? "").trim() === ""
+  );
+}
+
 export async function listReports() {
   return prisma.inventoryReport.findMany({
     orderBy: { closingDate: "desc" },
@@ -178,4 +262,98 @@ export async function suggestNextClosingIso(): Promise<string> {
   }
   const d = nextClosingAfter(last.closingDate);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+export async function importReportCsv(
+  reportId: string,
+  csvText: string,
+): Promise<{ ok: true; imported: number } | { ok: false; error: string }> {
+  try {
+    const rows = parseCsv(csvText);
+    if (rows.length === 0) {
+      return { ok: false, error: "CSVが空です。" };
+    }
+
+    const header = rows[0].map(normalizeHeaderName);
+    const requiredColumns = ["品名", "規格", "数量", "単位", "単価(税抜)", "備考"];
+    const colIndex = {
+      groupColor: header.findIndex((h) => h === "グループ色"),
+      productName: header.findIndex((h) => h === "品名"),
+      specification: header.findIndex((h) => h === "規格"),
+      quantity: header.findIndex((h) => h === "数量"),
+      unit: header.findIndex((h) => h === "単位"),
+      unitPrice: header.findIndex((h) => h === "単価(税抜)"),
+      remarks: header.findIndex((h) => h === "備考"),
+    };
+
+    for (const col of requiredColumns) {
+      if (!header.includes(col)) {
+        return {
+          ok: false,
+          error: `CSVヘッダーに「${col}」が見つかりません。テンプレートを使ってください。`,
+        };
+      }
+    }
+
+    const lines = rows
+      .slice(1)
+      .map((r) => {
+        const productName = (r[colIndex.productName] ?? "").trim();
+        const specification = (r[colIndex.specification] ?? "").trim();
+        const quantityRaw = (r[colIndex.quantity] ?? "").trim();
+        const unit = (r[colIndex.unit] ?? "").trim();
+        const unitPriceRaw = (r[colIndex.unitPrice] ?? "").trim();
+        const remarks = (r[colIndex.remarks] ?? "").trim();
+        const groupColorRaw = colIndex.groupColor >= 0 ? (r[colIndex.groupColor] ?? "").trim() : "";
+        const groupColor = groupColorRaw === "" ? null : groupColorRaw;
+        if (
+          isLineBlank({
+            productName,
+            specification,
+            quantity: quantityRaw,
+            unit,
+            unitPrice: unitPriceRaw,
+            remarks,
+            groupColor,
+          })
+        ) {
+          return null;
+        }
+
+        const quantity = parseQuantityInput(quantityRaw);
+        const unitPrice = parseMoneyInput(unitPriceRaw);
+        const amount = lineAmountExTax(quantity, unitPrice);
+
+        return {
+          productName,
+          specification,
+          quantity,
+          unit,
+          unitPrice,
+          amount,
+          remarks,
+          groupColor,
+        };
+      })
+      .filter((v): v is NonNullable<typeof v> => v !== null);
+
+    await prisma.$transaction(async (tx) => {
+      await tx.inventoryLine.deleteMany({ where: { reportId } });
+      if (lines.length > 0) {
+        await tx.inventoryLine.createMany({
+          data: lines.map((line, idx) => ({
+            reportId,
+            sortOrder: idx,
+            ...line,
+          })),
+        });
+      }
+    });
+
+    revalidatePath(`/reports/${reportId}`);
+    revalidatePath("/");
+    return { ok: true, imported: lines.length };
+  } catch {
+    return { ok: false, error: "CSV取込に失敗しました。" };
+  }
 }
