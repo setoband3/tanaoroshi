@@ -102,7 +102,7 @@ function LineRow({
       <td className="p-1 align-top text-right">
         <input
           inputMode="decimal"
-          className="w-full min-w-[4.5rem] rounded border border-zinc-300 px-2 py-1.5 text-right text-sm tabular-nums dark:border-zinc-600 dark:bg-zinc-900"
+          className="w-full min-w-[2.25rem] rounded border border-zinc-300 px-2 py-1.5 text-right text-sm tabular-nums dark:border-zinc-600 dark:bg-zinc-900"
           value={quantity}
           onChange={(e) => setQuantity(e.target.value)}
           onBlur={() => {
@@ -125,7 +125,7 @@ function LineRow({
       <td className="p-1 align-top text-right">
         <input
           inputMode="numeric"
-          className="w-full min-w-[6rem] rounded border border-zinc-300 px-2 py-1.5 text-right text-sm tabular-nums dark:border-zinc-600 dark:bg-zinc-900"
+          className="w-full min-w-[3.6rem] rounded border border-zinc-300 px-2 py-1.5 text-right text-sm tabular-nums dark:border-zinc-600 dark:bg-zinc-900"
           value={unitPrice}
           onChange={(e) => setUnitPrice(e.target.value)}
           onBlur={() => {
@@ -299,9 +299,9 @@ export function ReportEditor({ report }: { report: SerializedReport }) {
               <th className="whitespace-nowrap px-2 py-2 font-medium">グループ</th>
               <th className="min-w-[10rem] px-2 py-2 font-medium">品名</th>
               <th className="min-w-[8rem] px-2 py-2 font-medium">規格</th>
-              <th className="min-w-[4.5rem] px-2 py-2 text-right font-medium">数量</th>
+              <th className="min-w-[2.25rem] px-2 py-2 text-right font-medium">数量</th>
               <th className="min-w-[4rem] px-2 py-2 font-medium">単位</th>
-              <th className="min-w-[6rem] px-2 py-2 text-right font-medium">単価（税抜）</th>
+              <th className="min-w-[3.6rem] px-2 py-2 text-right font-medium">単価（税抜）</th>
               <th className="min-w-[6rem] px-2 py-2 text-right font-medium">合計（税抜）</th>
               <th className="min-w-[12rem] px-2 py-2 font-medium">備考</th>
               <th className="px-2 py-2 font-medium" />

@@ -17,7 +17,8 @@ export function CreateReportForm({ defaultClosing }: { defaultClosing: string })
         e.preventDefault();
         setError(null);
         startTransition(async () => {
-          const r = await createReport(date);
+          const shouldCopyPrevious = confirm("前月のレポートをコピーしますか？");
+          const r = await createReport(date, shouldCopyPrevious);
           if (r.ok) router.push(`/reports/${r.id}`);
           else setError(r.error);
         });

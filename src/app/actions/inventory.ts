@@ -26,18 +26,44 @@ export async function getReport(id: string) {
   });
 }
 
-export async function createReport(closingDateIso: string): Promise<
+export async function createReport(
+  closingDateIso: string,
+  shouldCopyPrevious: boolean,
+): Promise<
   | { ok: true; id: string }
   | { ok: false; error: string }
 > {
   try {
     const closing = parseLocalDate(closingDateIso);
     const { periodStart, periodEnd } = periodRangeForClosing(closing);
+    const previousReport = shouldCopyPrevious
+      ? await prisma.inventoryReport.findFirst({
+          where: { closingDate: { lt: closing } },
+          orderBy: { closingDate: "desc" },
+          include: { lines: { orderBy: { sortOrder: "asc" } } },
+        })
+      : null;
+
     const r = await prisma.inventoryReport.create({
       data: {
         closingDate: closing,
         periodStart,
         periodEnd,
+        lines: previousReport
+          ? {
+              create: previousReport.lines.map((line) => ({
+                sortOrder: line.sortOrder,
+                productName: line.productName,
+                specification: line.specification,
+                quantity: line.quantity,
+                unit: line.unit,
+                unitPrice: line.unitPrice,
+                amount: line.amount,
+                remarks: line.remarks,
+                groupColor: line.groupColor,
+              })),
+            }
+          : undefined,
       },
     });
     revalidatePath("/");
