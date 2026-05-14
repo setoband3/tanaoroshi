@@ -24,6 +24,9 @@ export default async function Home() {
         <section className="mb-10">
           <h2 className="mb-3 text-sm font-medium uppercase tracking-wide text-zinc-500">新規作成</h2>
           <CreateReportForm defaultClosing={defaultClosing} />
+          <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+            CSV取込は、各レポートの「開く」先の詳細画面にあります。
+          </p>
         </section>
 
         <section>
